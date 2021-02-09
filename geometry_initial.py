@@ -1,11 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+""" Import """
+from geometry_define import segment, angle, degree
 from geometry_define import sum_units, multiply_units, complex_units, equal
 from geometry_define import get_unit_type, get_unit_len, is_complex_type
 from geometry_define import get_complexunit_set
 from geometry_define import get_complexunit_except_unit, get_complexunit_inner_complexunit
 from geometry_define import get_unit_flatten_set
 from geometry_define import get_equal_except_unit
+from geometry_formula import is_isosceles, is_congruent
+from itertools import combinations
 
 """
 Define Entire Graph
@@ -137,24 +141,66 @@ class Graph:
                                                                                                get_complexunit_except_unit(excepted_unit, inner_sub_unit))
                                                                                      )
                                             graph.add_equal(equal(associated_complex_unit, each_complex_unit), equal_type)
-                                                        
+                                                            
+        """ space and collinear transform """
+        def space_and_collinear_transform(graph):
+            
+            return 0
+        
+        """ theorem transform """
+        def triangle_theorem_transform(graph):
+            triangles_list = list(combinations(graph.points.keys(), 3))
+            triangles_num = len(triangles_list)
+            for no_1 in range(triangles_num):
+                this_triangle = triangles_list[no_1]
+                """ interior angle summation 180° """
+                graph.add_equal(equal(sum_units(angle(this_triangle[1], this_triangle[0], this_triangle[2]), 
+                                                angle(this_triangle[0], this_triangle[1], this_triangle[2]), 
+                                                angle(this_triangle[0], this_triangle[2], this_triangle[1])), 
+                                      degree(180)), 'angle')
+                """ isosceles """
+                yes_isosceles, vertex_point, aside_points = is_isosceles(graph, this_triangle)
+                if yes_isosceles:
+                    graph.add_equal(equal(segment(vertex_point, aside_points[0]), 
+                                          segment(vertex_point, aside_points[1])), 'segment')
+                    graph.add_equal(equal(angle(vertex_point, aside_points[0], aside_points[1]), 
+                                          angle(vertex_point, aside_points[1], aside_points[0])), 'angle')
+                """ congruent and similar """
+                for no_2 in range(no_1+1, triangles_num):
+                    another_triangle = triangles_list[no_2]        
+                    """ congruent """
+                    yes_congruent, three_points_1, three_points_2 = is_congruent(graph, this_triangle, another_triangle)                            
+                    if yes_congruent:
+                        graph.add_equal(equal(segment(three_points_1[0], three_points_1[1]), 
+                                              segment(three_points_2[0], three_points_2[1])), 'segment')
+                        graph.add_equal(equal(segment(three_points_1[0], three_points_1[2]), 
+                                              segment(three_points_2[0], three_points_2[2])), 'segment')
+                        graph.add_equal(equal(segment(three_points_1[1], three_points_1[2]), 
+                                              segment(three_points_2[1], three_points_2[2])), 'segment')
+                        graph.add_equal(equal(angle(three_points_1[1], three_points_1[0], three_points_1[2]), 
+                                              angle(three_points_2[1], three_points_2[0], three_points_2[2])), 'angle')
+                        graph.add_equal(equal(angle(three_points_1[0], three_points_1[1], three_points_1[2]), 
+                                              angle(three_points_2[0], three_points_2[1], three_points_2[2])), 'angle')
+                        graph.add_equal(equal(angle(three_points_1[0], three_points_1[2], three_points_1[1]), 
+                                              angle(three_points_2[0], three_points_2[2], three_points_2[1])), 'angle')
+                    """ similar """
+                    
+            return 0
+        
+        def quadrilateral_theorem_transform(graph):
+            
+            return 0
+        
         complex_units_equal_transform(self, self.segment_equals, 'segment')
         complex_units_equal_transform(self, self.angle_equals, 'angle')
-    
-        """ space and collinear transform """
-        def space_and_collinear_transform(self):
-            
-            return 0
-    
-        """ theorem transform """
-        def triangle_theorem_transform(self):
-            
-            return 0
+        space_and_collinear_transform(self)
+        triangle_theorem_transform(self)
+        quadrilateral_theorem_transform(self)
     
     """ Query """
     def query(self, query_equal):
+        
         return 0
-    
     
     """ Display """
     def display(self):

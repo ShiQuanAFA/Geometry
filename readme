@@ -8,6 +8,9 @@ this_complex_unit = sum_units(segment('A', 'E'), segment('E', 'B'))
 this_complex_unit = sum_units(segment('A', 'E'), segment('E', 'B'), segment('C', 'B'))
 this_complex_unit = sum_units(segment('A', 'E'), segment('B', 'E'), segment('C', 'B'), segment('B', 'C'))
 this_equal = equal(segment('A', 'B'), segment('B', 'C'), sum_units(segment('A', 'E'), segment('E', 'B')))
+＃交换律测试
+t.add_equal(equal(multiply_units(segment('A', 'B'), segment('A', 'D')), multiply_units(segment('C','M'), segment('C', 'N'))), 'segment')
+t.add_equal(equal(multiply_units(segment('A', 'B'), segment('A', 'D')), multiply_units(segment('N','C'), segment('M', 'C'))), 'segment')
 ＃乘法分配律测试
 this_complex_unit = multiply_units(sum_units(segment('A', 'E'), segment('E', 'B')), segment('A', 'C'))
 this_complex_unit　= multiply_units(sum_units(segment('A', 'E'), segment('E', 'A')), segment('A', 'C'))
@@ -19,3 +22,5 @@ t.add_equal(equal(multiply_units(segment('A', 'B'), segment('Q', 'F'), segment('
 #数值测试
 t.add_equal(equal(sum_units(angle('A', 'B', 'C'), angle('A', 'D', 'C')), degree(180)), 'angle')
 t.add_equal(equal(sum_units(angle('A', 'B', 'C'), angle('A', 'M', 'C')), degree(180)), 'angle')
+
+
