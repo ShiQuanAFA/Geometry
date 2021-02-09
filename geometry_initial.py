@@ -8,7 +8,7 @@ from geometry_define import get_complexunit_set
 from geometry_define import get_complexunit_except_unit, get_complexunit_inner_complexunit
 from geometry_define import get_unit_flatten_set
 from geometry_define import get_equal_except_unit
-from geometry_formula import is_isosceles, is_congruent
+from geometry_formula import is_isosceles, is_congruent, is_similar
 from itertools import combinations
 
 """
@@ -184,8 +184,26 @@ class Graph:
                         graph.add_equal(equal(angle(three_points_1[0], three_points_1[2], three_points_1[1]), 
                                               angle(three_points_2[0], three_points_2[2], three_points_2[1])), 'angle')
                     """ similar """
-                    
-            return 0
+                    yes_similar, three_points_1, three_points_2 = is_similar(graph, this_triangle, another_triangle)
+                    if yes_similar:
+                        graph.add_equal(equal(multiply_units(segment(three_points_1[0], three_points_1[1]), 
+                                                             segment(three_points_2[1], three_points_2[2])), 
+                                              multiply_units(segment(three_points_1[1], three_points_1[2]), 
+                                                             segment(three_points_2[0], three_points_2[1]))), 'segment')
+                        graph.add_equal(equal(multiply_units(segment(three_points_1[0], three_points_1[1]), 
+                                                             segment(three_points_2[0], three_points_2[2])), 
+                                              multiply_units(segment(three_points_1[0], three_points_1[2]), 
+                                                             segment(three_points_2[0], three_points_2[1]))), 'segment')
+                        graph.add_equal(equal(multiply_units(segment(three_points_1[0], three_points_1[2]), 
+                                                             segment(three_points_2[1], three_points_2[2])), 
+                                              multiply_units(segment(three_points_1[1], three_points_1[2]), 
+                                                             segment(three_points_2[0], three_points_2[2]))), 'segment')
+                        graph.add_equal(equal(angle(three_points_1[1], three_points_1[0], three_points_1[2]), 
+                                              angle(three_points_2[1], three_points_2[0], three_points_2[2])), 'angle')
+                        graph.add_equal(equal(angle(three_points_1[0], three_points_1[1], three_points_1[2]), 
+                                              angle(three_points_2[0], three_points_2[1], three_points_2[2])), 'angle')
+                        graph.add_equal(equal(angle(three_points_1[0], three_points_1[2], three_points_1[1]), 
+                                              angle(three_points_2[0], three_points_2[2], three_points_2[1])), 'angle')
         
         def quadrilateral_theorem_transform(graph):
             

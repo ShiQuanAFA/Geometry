@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 """ Import """
 from geometry_define import segment, angle, equal
+from geometry_define import multiply_units
 
 """ Calculate functions """
 
@@ -86,8 +87,42 @@ def is_similar(graph, triangle_1, triangle_2):
         point_aside_1 = tuple_del(triangle_1, point_vertex_1)
         for point_vertex_2 in triangle_2:
             point_aside_2 = tuple_del(triangle_2, point_vertex_2)
-            
-
+            for point_aside_1_1 in point_aside_1:
+                point_aside_1_2 = tuple_del(point_aside_1, point_aside_1_1)[0]
+                point_aside_2_1 = point_aside_2[0]
+                point_aside_2_2 = point_aside_2[1]
+                """ A or S """
+                if equal(angle(point_aside_1[0], point_vertex_1, point_aside_1[1]), 
+                         angle(point_aside_2[0], point_vertex_2, point_aside_2[1])) in graph.angle_equals:
+                    """ AA """
+                    if equal(angle(point_vertex_1, point_aside_1_1, point_aside_1_2), 
+                             angle(point_vertex_2, point_aside_2_1, point_aside_2_2)) in graph.angle_equals:
+                        is_similar_result = True
+                        three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
+                        three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2)
+                    """ AS """
+                    if equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
+                                            segment(point_aside_2_2, point_vertex_2)), 
+                             multiply_units(segment(point_aside_1_2, point_vertex_1), 
+                                            segment(point_aside_2_1, point_vertex_2))) in graph.segment_equals:
+                        is_similar_result = True
+                        three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
+                        three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2)
+                elif equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
+                                          segment(point_aside_2_2, point_vertex_2)), 
+                           multiply_units(segment(point_aside_1_2, point_vertex_1), 
+                                          segment(point_aside_2_1, point_vertex_2))) in graph.segment_equals:
+                    """ SS """
+                    if equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
+                                            segment(point_aside_2_1, point_aside_2_2)), 
+                             multiply_units(segment(point_aside_2_1, point_vertex_2), 
+                                            segment(point_aside_1_1, point_aside_1_2))) in graph.segment_equals:
+                        is_similar_result = True
+                        three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
+                        three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2)
+    """ return judge result """
+    return is_similar_result, three_points_1, three_points_2
+                        
 """ tuple del """
 def tuple_del(this_tuple, this_value):
     this_tuple_list = list(this_tuple)
