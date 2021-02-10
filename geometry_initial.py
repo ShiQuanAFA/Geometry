@@ -253,13 +253,24 @@ class Graph:
                         """ coexist with a circle """
                         if graph.query(equal(sum_units(angle(point_out, point_vertex, point_aside[0]), 
                                                        angle(point_out, point_vertex, point_aside[1])), 
-                                             angle(point_aside[0], point_vertex, point_aside[1])), 'angle') and \
-                           graph.query(equal(sum_units(angle(point_aside[0], point_vertex, point_aside[1]), 
-                                                       angle(point_aside[0], point_out, point_aside[1])), 
-                                             degree(180)), 'angle'):
-                            graph.add_equal(equal(angle(point_out, point_vertex, point_aside[1]), 
-                                                  angle(point_out, point_aside[0], point_aside[1])), 'angle')
-                            
+                                             angle(point_aside[0], point_vertex, point_aside[1])), 'angle'):
+                            if graph.query(equal(sum_units(angle(point_aside[0], point_vertex, point_aside[1]), 
+                                                           angle(point_aside[0], point_out, point_aside[1])), 
+                                                 degree(180)), 'angle') or \
+                               graph.query(equal(angle(point_out, point_vertex, point_aside[1]), 
+                                                 angle(point_out, point_aside[0], point_aside[1])), 'angle') or \
+                               graph.query(equal(angle(point_out, point_vertex, point_aside[0]), 
+                                                 angle(point_out, point_aside[1], point_aside[0])), 'angle'):
+                                graph.add_equal(equal(angle(point_out, point_vertex, point_aside[1]), 
+                                                      angle(point_out, point_aside[0], point_aside[1])), 'angle')
+                                graph.add_equal(equal(angle(point_out, point_vertex, point_aside[0]), 
+                                                      angle(point_out, point_aside[1], point_aside[0])), 'angle')
+                                graph.add_equal(equal(angle(point_vertex, point_out, point_aside[1]), 
+                                                      angle(point_vertex, point_aside[0], point_aside[1])), 'angle')
+                                graph.add_equal(equal(angle(point_vertex, point_out, point_aside[0]), 
+                                                      angle(point_vertex, point_aside[1], point_aside[0])), 'angle')
+        
+        """ deduce transform """                    
         if deduce_no == 0:
             space_and_collinear_transform(self)
         complex_units_equal_transform(self, self.segment_equals, 'segment')
@@ -307,7 +318,7 @@ class Graph:
         
         def get_simplified_unit_math_str(this_unit):
             this_unit_math_str = unit_to_math_str(this_unit)
-            if this_unit_math_str[0] == '(' and this_unit_math_str[-1] == ')':
+            if get_unit_type(this_unit) == 'sum':
                 return this_unit_math_str[1:-1]
             else:
                 return this_unit_math_str
