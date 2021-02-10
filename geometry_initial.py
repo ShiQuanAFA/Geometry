@@ -8,7 +8,9 @@ from geometry_define import get_complexunit_set
 from geometry_define import get_complexunit_except_unit, get_complexunit_inner_complexunit
 from geometry_define import get_unit_flatten_set
 from geometry_define import get_equal_except_unit
-from geometry_formula import is_isosceles, is_congruent, is_similar
+from geometry_formula import is_collinear, is_isosceles, is_congruent, is_similar
+from geometry_formula import cal_an_angle_degree
+from geometry_formula import tuple_del, tuple_except_tuple
 from itertools import combinations
 
 """
@@ -67,8 +69,49 @@ class Graph:
             raise Exception('add equal type error!')
 
     """ Deduction """
-    def deduce(self):
+    def deduce(self, deduce_no):
         
+        """ space and collinear transform """
+        def space_and_collinear_transform(graph):
+            """ find collinear """
+            three_points_list = list(combinations(graph.points.keys(), 3))
+            triangles_list = three_points_list.copy()
+            collinear_list = []
+            for this_three_point in three_points_list:
+                yes_collinear, vertex_point, aside_points = is_collinear(graph, this_three_point)
+                if yes_collinear:
+                    triangles_list.remove(this_three_point)
+                    collinear_list.append((aside_points[0], vertex_point, aside_points[1]))
+            graph.triangles_list = triangles_list
+            graph.collinear_list = collinear_list
+            """ collinear transform """
+            for this_collinear in collinear_list:
+                graph.add_equal(equal(sum_units(segment(this_collinear[0], this_collinear[1]), 
+                                                segment(this_collinear[2], this_collinear[1])), 
+                                      segment(this_collinear[0], this_collinear[2])), 'segment')
+                out_points = tuple_except_tuple(graph.points.keys(), this_collinear)
+                for point_out in out_points:
+                    graph.add_equal(equal(sum_units(angle(point_out, this_collinear[1], this_collinear[0]), 
+                                                    angle(point_out, this_collinear[1], this_collinear[2])), 
+                                          degree(180)), 'angle')
+                    graph.add_equal(equal(angle(point_out, this_collinear[0], this_collinear[1]), 
+                                          angle(point_out, this_collinear[0], this_collinear[2])), 'angle')
+                    graph.add_equal(equal(angle(point_out, this_collinear[2], this_collinear[1]), 
+                                          angle(point_out, this_collinear[2], this_collinear[0])), 'angle')
+            """ not collinear transform """
+            for this_triangle in triangles_list:
+                out_points = tuple_except_tuple(graph.points.keys(), this_triangle)
+                for point_vertex in this_triangle:
+                    point_aside = tuple_del(this_triangle, point_vertex)
+                    for point_out in out_points:
+                        degree_1 = cal_an_angle_degree(graph, point_out, point_vertex, point_aside[0])
+                        degree_2 = cal_an_angle_degree(graph, point_out, point_vertex, point_aside[1])
+                        degree_sum = cal_an_angle_degree(graph, point_aside[0], point_vertex, point_aside[1])
+                        if degree_1 > 1.0 and degree_2 > 1.0 and abs(degree_sum - degree_1 - degree_2) < 1.0:
+                            graph.add_equal(equal(sum_units(angle(point_out, point_vertex, point_aside[0]), 
+                                                            angle(point_out, point_vertex, point_aside[1])), 
+                                                  angle(point_aside[0], point_vertex, point_aside[1])), 'angle')
+
         """ complex units equal transform """
         def complex_units_equal_transform(graph, equals_list, equal_type):
             for each_equal in equals_list:
@@ -141,15 +184,10 @@ class Graph:
                                                                                                get_complexunit_except_unit(excepted_unit, inner_sub_unit))
                                                                                      )
                                             graph.add_equal(equal(associated_complex_unit, each_complex_unit), equal_type)
-                                                            
-        """ space and collinear transform """
-        def space_and_collinear_transform(graph):
-            
-            return 0
         
         """ theorem transform """
         def triangle_theorem_transform(graph):
-            triangles_list = list(combinations(graph.points.keys(), 3))
+            triangles_list = graph.triangles_list
             triangles_num = len(triangles_list)
             for no_1 in range(triangles_num):
                 this_triangle = triangles_list[no_1]
@@ -209,16 +247,27 @@ class Graph:
             
             return 0
         
+        if deduce_no == 0:
+            space_and_collinear_transform(self)
         complex_units_equal_transform(self, self.segment_equals, 'segment')
         complex_units_equal_transform(self, self.angle_equals, 'angle')
-        space_and_collinear_transform(self)
         triangle_theorem_transform(self)
         quadrilateral_theorem_transform(self)
     
     """ Query """
-    def query(self, query_equal):
-        
-        return 0
+    def query(self, query_equal, equal_type):
+        query_yes = False
+        if equal_type == 'segment':
+            for each_equal in self.segment_equals:
+                if query_equal.issubset(each_equal):
+                    query_yes = True
+                    break
+        elif equal_type == 'angle':
+            for each_equal in self.angle_equals:
+                if query_equal.issubset(each_equal):
+                    query_yes = True
+                    break
+        return query_yes
     
     """ Display """
     def display(self):
