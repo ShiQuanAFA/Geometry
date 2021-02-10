@@ -33,11 +33,11 @@ def is_isosceles(graph, this_triangle):
     """ every vertex """
     for point_vertex in this_triangle:
         point_aside = tuple_del(this_triangle, point_vertex)
-        if (equal(segment(point_aside[0], point_vertex), 
-                  segment(point_aside[1], point_vertex)) in graph.segment_equals 
+        if (graph.query(equal(segment(point_aside[0], point_vertex), 
+                              segment(point_aside[1], point_vertex)), 'segment') 
             ) or ( 
-            equal(angle(point_vertex, point_aside[0], point_aside[1]), 
-                  angle(point_vertex, point_aside[1], point_aside[0])) in graph.angle_equals):
+            graph.query(equal(angle(point_vertex, point_aside[0], point_aside[1]), 
+                              angle(point_vertex, point_aside[1], point_aside[0])), 'angle')):
             is_isosceles_result = True
             vertex_point = point_vertex
             aside_points = point_aside
@@ -56,43 +56,43 @@ def is_congruent(graph, triangle_1, triangle_2):
         for point_vertex_2 in triangle_2:
             point_aside_2 = tuple_del(triangle_2, point_vertex_2)
             """ A or S """
-            if equal(angle(point_aside_1[0], point_vertex_1, point_aside_1[1]), 
-                     angle(point_aside_2[0], point_vertex_2, point_aside_2[1])) in graph.angle_equals:
+            if graph.query(equal(angle(point_aside_1[0], point_vertex_1, point_aside_1[1]), 
+                                 angle(point_aside_2[0], point_vertex_2, point_aside_2[1])), 'angle'):
                 for point_aside_1_1 in point_aside_1:
                     point_aside_1_2 = tuple_del(point_aside_1, point_aside_1_1)[0]
                     point_aside_2_1 = point_aside_2[0]
                     point_aside_2_2 = point_aside_2[1]
                     """ AS """
-                    if equal(segment(point_aside_1_1, point_vertex_1), 
-                             segment(point_aside_2_1, point_vertex_2)) in graph.segment_equals:
+                    if graph.query(equal(segment(point_aside_1_1, point_vertex_1), 
+                                         segment(point_aside_2_1, point_vertex_2)), 'segment'):
                         """ ASS """
-                        if equal(segment(point_aside_1_2, point_vertex_1), 
-                                 segment(point_aside_2_2, point_vertex_2)) in graph.segment_equals:
+                        if graph.query(equal(segment(point_aside_1_2, point_vertex_1), 
+                                             segment(point_aside_2_2, point_vertex_2)), 'segment'):
                             is_congruent_result = True
                             three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
                             three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2)
                             return is_congruent_result, three_points_1, three_points_2
-            elif equal(segment(point_aside_1[0], point_aside_1[1]), 
-                       segment(point_aside_2[0], point_aside_2[1])) in graph.segment_equals:
+            elif graph.query(equal(segment(point_aside_1[0], point_aside_1[1]), 
+                                   segment(point_aside_2[0], point_aside_2[1])), 'segment'):
                 for point_aside_1_1 in point_aside_1:
                     point_aside_1_2 = tuple_del(point_aside_1, point_aside_1_1)[0]
                     point_aside_2_1 = point_aside_2[0]
                     point_aside_2_2 = point_aside_2[1]
                     """ SS or SA"""
-                    if equal(segment(point_aside_1_1, point_vertex_1), 
-                             segment(point_aside_2_1, point_vertex_2)) in graph.segment_equals:
+                    if graph.query(equal(segment(point_aside_1_1, point_vertex_1), 
+                                         segment(point_aside_2_1, point_vertex_2)), 'segment'):
                         """ SSS """
-                        if equal(segment(point_aside_1_2, point_vertex_1), 
-                                 segment(point_aside_2_2, point_vertex_2)) in graph.segment_equals:
+                        if graph.query(equal(segment(point_aside_1_2, point_vertex_1), 
+                                             segment(point_aside_2_2, point_vertex_2)), 'segment'):
                             is_congruent_result = True
                             three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
                             three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2)   
                             return is_congruent_result, three_points_1, three_points_2
-                    elif equal(angle(point_vertex_1, point_aside_1_1, point_aside_1_2), 
-                               angle(point_vertex_2, point_aside_2_1, point_aside_2_2)) in graph.angle_equals:
+                    elif graph.query(equal(angle(point_vertex_1, point_aside_1_1, point_aside_1_2), 
+                                           angle(point_vertex_2, point_aside_2_1, point_aside_2_2)), 'angle'):
                         """ SAA """
-                        if equal(angle(point_vertex_1, point_aside_1_2, point_aside_1_1), 
-                                 angle(point_vertex_2, point_aside_2_2, point_aside_2_1)) in graph.angle_equals:
+                        if graph.query(equal(angle(point_vertex_1, point_aside_1_2, point_aside_1_1), 
+                                             angle(point_vertex_2, point_aside_2_2, point_aside_2_1)), 'angle'):
                             is_congruent_result = True
                             three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
                             three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2) 
@@ -115,33 +115,33 @@ def is_similar(graph, triangle_1, triangle_2):
                 point_aside_2_1 = point_aside_2[0]
                 point_aside_2_2 = point_aside_2[1]
                 """ A or S """
-                if equal(angle(point_aside_1[0], point_vertex_1, point_aside_1[1]), 
-                         angle(point_aside_2[0], point_vertex_2, point_aside_2[1])) in graph.angle_equals:
+                if graph.query(equal(angle(point_aside_1[0], point_vertex_1, point_aside_1[1]), 
+                                     angle(point_aside_2[0], point_vertex_2, point_aside_2[1])), 'angle'):
                     """ AA """
-                    if equal(angle(point_vertex_1, point_aside_1_1, point_aside_1_2), 
-                             angle(point_vertex_2, point_aside_2_1, point_aside_2_2)) in graph.angle_equals:
+                    if graph.query(equal(angle(point_vertex_1, point_aside_1_1, point_aside_1_2), 
+                                         angle(point_vertex_2, point_aside_2_1, point_aside_2_2)), 'angle'):
                         is_similar_result = True
                         three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
                         three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2)
                         return is_similar_result, three_points_1, three_points_2
                     """ AS """
-                    if equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
-                                            segment(point_aside_2_2, point_vertex_2)), 
-                             multiply_units(segment(point_aside_1_2, point_vertex_1), 
-                                            segment(point_aside_2_1, point_vertex_2))) in graph.segment_equals:
+                    if graph.query(equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
+                                                        segment(point_aside_2_2, point_vertex_2)), 
+                                         multiply_units(segment(point_aside_1_2, point_vertex_1), 
+                                                        segment(point_aside_2_1, point_vertex_2))), 'segment'):
                         is_similar_result = True
                         three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
                         three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2)
                         return is_similar_result, three_points_1, three_points_2
-                elif equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
-                                          segment(point_aside_2_2, point_vertex_2)), 
-                           multiply_units(segment(point_aside_1_2, point_vertex_1), 
-                                          segment(point_aside_2_1, point_vertex_2))) in graph.segment_equals:
+                elif graph.query(equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
+                                                      segment(point_aside_2_2, point_vertex_2)), 
+                                       multiply_units(segment(point_aside_1_2, point_vertex_1), 
+                                                      segment(point_aside_2_1, point_vertex_2))), 'segment'):
                     """ SS """
-                    if equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
-                                            segment(point_aside_2_1, point_aside_2_2)), 
-                             multiply_units(segment(point_aside_2_1, point_vertex_2), 
-                                            segment(point_aside_1_1, point_aside_1_2))) in graph.segment_equals:
+                    if graph.query(equal(multiply_units(segment(point_aside_1_1, point_vertex_1), 
+                                                        segment(point_aside_2_1, point_aside_2_2)), 
+                                         multiply_units(segment(point_aside_2_1, point_vertex_2), 
+                                                        segment(point_aside_1_1, point_aside_1_2))), 'segment'):
                         is_similar_result = True
                         three_points_1 = (point_aside_1_1, point_vertex_1, point_aside_1_2)
                         three_points_2 = (point_aside_2_1, point_vertex_2, point_aside_2_2)

@@ -244,9 +244,22 @@ class Graph:
                                               angle(three_points_2[0], three_points_2[2], three_points_2[1])), 'angle')
         
         def quadrilateral_theorem_transform(graph):
-            
-            return 0
-        
+            triangles_list = graph.triangles_list
+            for this_triangle in triangles_list:
+                out_points = tuple_except_tuple(graph.points.keys(), this_triangle)
+                for point_vertex in this_triangle:
+                    point_aside = tuple_del(this_triangle, point_vertex)
+                    for point_out in out_points:
+                        """ coexist with a circle """
+                        if graph.query(equal(sum_units(angle(point_out, point_vertex, point_aside[0]), 
+                                                       angle(point_out, point_vertex, point_aside[1])), 
+                                             angle(point_aside[0], point_vertex, point_aside[1])), 'angle') and \
+                           graph.query(equal(sum_units(angle(point_aside[0], point_vertex, point_aside[1]), 
+                                                       angle(point_aside[0], point_out, point_aside[1])), 
+                                             degree(180)), 'angle'):
+                            graph.add_equal(equal(angle(point_out, point_vertex, point_aside[1]), 
+                                                  angle(point_out, point_aside[0], point_aside[1])), 'angle')
+                            
         if deduce_no == 0:
             space_and_collinear_transform(self)
         complex_units_equal_transform(self, self.segment_equals, 'segment')
