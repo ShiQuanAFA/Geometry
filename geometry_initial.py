@@ -87,13 +87,14 @@ class Graph:
                                       segment(this_collinear[0], this_collinear[2])), 'segment')
                 out_points = tuple_except_tuple(graph.points.keys(), this_collinear)
                 for point_out in out_points:
-                    graph.add_equal(equal(sum_units(angle(point_out, this_collinear[1], this_collinear[0]), 
-                                                    angle(point_out, this_collinear[1], this_collinear[2])), 
-                                          degree(180)), 'angle')
-                    graph.add_equal(equal(angle(point_out, this_collinear[0], this_collinear[1]), 
-                                          angle(point_out, this_collinear[0], this_collinear[2])), 'angle')
-                    graph.add_equal(equal(angle(point_out, this_collinear[2], this_collinear[1]), 
-                                          angle(point_out, this_collinear[2], this_collinear[0])), 'angle')
+                    if not is_collinear(graph, (point_out, this_collinear[0], this_collinear[1]))[0]:
+                        graph.add_equal(equal(sum_units(angle(point_out, this_collinear[1], this_collinear[0]), 
+                                                        angle(point_out, this_collinear[1], this_collinear[2])), 
+                                              degree(180)), 'angle')
+                        graph.add_equal(equal(angle(point_out, this_collinear[0], this_collinear[1]), 
+                                              angle(point_out, this_collinear[0], this_collinear[2])), 'angle')
+                        graph.add_equal(equal(angle(point_out, this_collinear[2], this_collinear[1]), 
+                                              angle(point_out, this_collinear[2], this_collinear[0])), 'angle')
             """ not collinear transform """
             for this_triangle in triangles_list:
                 out_points = tuple_except_tuple(graph.points.keys(), this_triangle)
@@ -103,7 +104,7 @@ class Graph:
                         degree_1 = cal_an_angle_degree(graph, point_out, point_vertex, point_aside[0])
                         degree_2 = cal_an_angle_degree(graph, point_out, point_vertex, point_aside[1])
                         degree_sum = cal_an_angle_degree(graph, point_aside[0], point_vertex, point_aside[1])
-                        if degree_1 > 1.0 and degree_2 > 1.0 and abs(degree_sum - degree_1 - degree_2) < 1.0:
+                        if degree_1 > 5.0 and degree_2 > 5.0 and abs(degree_sum - degree_1 - degree_2) < 2.0:
                             graph.add_equal(equal(sum_units(angle(point_out, point_vertex, point_aside[0]), 
                                                             angle(point_out, point_vertex, point_aside[1])), 
                                                   angle(point_aside[0], point_vertex, point_aside[1])), 'angle')
