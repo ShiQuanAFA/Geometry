@@ -49,27 +49,49 @@ def math_str_to_equal(this_equal_math_str):
     return result_equal
 
 """ Start Program """
-t = Graph('t65')
-t.add_point('A', -2.03, 6.83)
-t.add_point('B', 5.88, 6.71)
-t.add_point('C', 10.27, 0.78)
-t.add_point('D', 2.17, -1.08)
-t.add_point('E', 2.01, 4.84)
-t.add_point('F', 1.9, 6.77)
-t.add_point('G', 8.08, 3.74)
+def start(name, point_list, condition_str_list, need_prove_str, 
+          deduce_num=5, auxiliary_num=2):
+    """ input info """
+    this_problem = Graph(name)
+    for this_point_info in point_list:
+        this_problem.add_point(this_point_info[0], this_point_info[1], this_point_info[2])
+    for this_condition_str in condition_str_list:
+        if '∠' in this_condition_str:
+            this_problem.add_equal(math_str_to_equal(this_condition_str), 'angle')
+        else:
+            this_problem.add_equal(math_str_to_equal(this_condition_str), 'segment')
+    print('Graph info input success!')
+    """ need prove """
+    has_proved = False
+    need_prove_equal = math_str_to_equal(need_prove_str)
+    if '∠' in need_prove_str:
+        need_prove_type = 'angle'
+    else:
+        need_prove_type = 'segment'
+    """ deduce """
+    for deduce_no in range(deduce_num):
+        this_problem.deduce(deduce_no)
+        if this_problem.query(need_prove_equal, need_prove_type):
+            has_proved = True
+            print('Has proved!!!')
+            break
+    """ auxiliary deduce """
+    if not has_proved:
+        
+        return 0
+    return this_problem, has_proved
 
+name = '中国联赛第一题'
+point_list = [
+              ['A', -2.03, 6.83], 
+              ['B', 5.88, 6.71], 
+              ['C', 10.27, 0.78]
+              ]
 condition_str_list = [
+                      'AB=AC', 
                       '∠ABC+∠ADC=180°', 
                       '∠ABC+∠AMC=180°'
                       ]
-for this_condition_str in condition_str_list:
-    if '∠' in this_condition_str:
-        t.add_equal(math_str_to_equal(this_condition_str), 'angle')
-    else:
-        t.add_equal(math_str_to_equal(this_condition_str), 'segment')
-        
-t.deduce(deduce_no=0)
-t.deduce(deduce_no=1)
-
-t.display()
-
+need_prove_str = 'CM=CN'
+t, ok = start(name, point_list, condition_str_list, need_prove_str, 
+              deduce_num=3, auxiliary_num=1)

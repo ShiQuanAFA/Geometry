@@ -22,7 +22,6 @@ class Graph:
         self.name = name
         self.points = {}
         """ Graph Known Conditions """
-        self.angle_values = {}
         self.segment_equals = []
         self.angle_equals = []
         
@@ -30,9 +29,6 @@ class Graph:
     def add_point(self, point_name, point_location_x, point_location_y):
         self.points[point_name] = {'location_x': point_location_x, 
                                    'location_y': point_location_y}
-    
-    def add_angle_value(self, this_angle_unit, this_value):
-        self.angle_values[this_angle_unit] = this_value
     
     def add_equal(self, this_equal, equal_type):
         
@@ -331,6 +327,9 @@ class Graph:
                 
         print('Graph Name:  ', self.name)
         print('points num:  ', len(self.points))
+        for each_point in self.points:
+            location = self.points[each_point]
+            print('  ', each_point, '  (', location['location_x'], ',', location['location_y'], ')')
         print('segment equals:  ', len(self.segment_equals))
         for each_segment_equal in self.segment_equals:
             print('  ', equal_to_math_str(each_segment_equal))
