@@ -65,7 +65,8 @@ class Graph:
             raise Exception('add equal type error!')
 
     """ Deduction """
-    def deduce(self, deduce_no):
+    def deduce(self, deduce_no, deduce_config={'angle_complex_max_len': 3, 
+                                               'pre_check_triangle':False}):
         
         """ space and collinear transform """
         def space_and_collinear_transform(graph):
@@ -123,11 +124,12 @@ class Graph:
                             for each_another_equal in equals_list:
                                 if each_sub_unit in each_another_equal:
                                     for each_another_sub_unit in get_equal_except_unit(each_another_equal, each_sub_unit):
-                                        graph.add_equal(equal(
-                                            complex_units(complex_type, 
-                                                          get_complexunit_except_unit(each_complex_unit, each_sub_unit), 
-                                                          each_another_sub_unit), 
-                                            each_complex_unit), equal_type)                      
+                                        new_complex_unit = complex_units(complex_type, 
+                                                                         get_complexunit_except_unit(each_complex_unit, each_sub_unit), 
+                                                                         each_another_sub_unit)
+                                        if equal_type == 'angle' and get_unit_len(new_complex_unit) > deduce_config['angle_complex_max_len']:
+                                            continue
+                                        graph.add_equal(equal(new_complex_unit, each_complex_unit), equal_type)                      
                         """ eliminate sub unit """
                         """ AB+BM=AB+BC ---> BM=BC ; AB+BM+MN=AB+BC ---> BM+MN=BC """
                         """ AB*BM=AB*BC ---> BM=BC ; AB*BM*MN=AB*BC*DE ---> BM*MN=BC*DE """
@@ -274,6 +276,9 @@ class Graph:
         complex_units_equal_transform(self, self.angle_equals, 'angle')
         triangle_theorem_transform(self)
         quadrilateral_theorem_transform(self)
+    
+    """ Auxiliary Point """
+    
     
     """ Query """
     def query(self, query_equal, equal_type):

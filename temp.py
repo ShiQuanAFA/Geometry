@@ -21,7 +21,10 @@ for this_condition_str in condition_str_list:
         t.add_equal(math_str_to_equal(this_condition_str), 'angle')
     else:
         t.add_equal(math_str_to_equal(this_condition_str), 'segment')
-        
+
+deduce_config={'angle_complex_max_len': 3, 
+               'pre_check_triangle': False}
+
 t.deduce(deduce_no=0)
 t.deduce(deduce_no=1)
 

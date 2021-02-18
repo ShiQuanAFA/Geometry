@@ -50,7 +50,9 @@ def math_str_to_equal(this_equal_math_str):
 
 """ Start Program """
 def start(name, point_list, condition_str_list, need_prove_str, 
-          deduce_num=5, auxiliary_num=2):
+          deduce_num=5, auxiliary_num=2, 
+          deduce_config={'angle_complex_max_len': 3, 
+                         'pre_check_triangle': False}):
     """ input info """
     this_problem = Graph(name)
     for this_point_info in point_list:
@@ -70,7 +72,7 @@ def start(name, point_list, condition_str_list, need_prove_str,
         need_prove_type = 'segment'
     """ deduce """
     for deduce_no in range(deduce_num):
-        this_problem.deduce(deduce_no)
+        this_problem.deduce(deduce_no, deduce_config)
         if this_problem.query(need_prove_equal, need_prove_type):
             has_proved = True
             print('Has proved!!!')
@@ -94,4 +96,6 @@ condition_str_list = [
                       ]
 need_prove_str = 'CM=CN'
 t, ok = start(name, point_list, condition_str_list, need_prove_str, 
-              deduce_num=3, auxiliary_num=1)
+              deduce_num=3, auxiliary_num=1, 
+              deduce_config={'angle_complex_max_len': 3, 
+                             'pre_check_triangle': False})
