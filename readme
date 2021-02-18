@@ -1,29 +1,47 @@
 requirements：
 multiset==2.1.1
 
+软件说明：欧式几何证明题自动推导
 
-测试用例：
-＃基本运算测试
-this_complex_unit = sum_units(segment('A', 'E'), segment('E', 'B'))
-this_complex_unit = sum_units(segment('A', 'E'), segment('E', 'B'), segment('C', 'B'))
-this_complex_unit = sum_units(segment('A', 'E'), segment('B', 'E'), segment('C', 'B'), segment('B', 'C'))
-this_equal = equal(segment('A', 'B'), segment('B', 'C'), sum_units(segment('A', 'E'), segment('E', 'B')))
-＃交换律测试
-t.add_equal(equal(multiply_units(segment('A', 'B'), segment('A', 'D')), multiply_units(segment('C','M'), segment('C', 'N'))), 'segment')
-t.add_equal(equal(multiply_units(segment('A', 'B'), segment('A', 'D')), multiply_units(segment('N','C'), segment('M', 'C'))), 'segment')
-＃乘法分配律测试
-this_complex_unit = multiply_units(sum_units(segment('A', 'E'), segment('E', 'B')), segment('A', 'C'))
-this_complex_unit　= multiply_units(sum_units(segment('A', 'E'), segment('E', 'A')), segment('A', 'C'))
-t.add_equal(equal(multiply_units(segment('A', 'B'), segment('C', 'A')), multiply_units(sum_units(segment('A', 'E'), segment('E', 'M'), segment('M', 'B')), segment('A', 'C'))), 'segment')
-t.add_equal(equal(multiply_units(segment('A', 'B'), segment('C', 'A')), multiply_units(sum_units(segment('A', 'E'), segment('E', 'A'), segment('M', 'B')), segment('A', 'C'))), 'segment')
-＃乘法结合律测试
-t.add_equal(equal(multiply_units(segment('A', 'B'), segment('C', 'A')), sum_units(multiply_units(segment('A', 'E'), segment('A','C')), multiply_units(segment('E', 'M'), segment('A','C')), multiply_units(segment('M', 'B'), segment('A', 'C')))), 'segment')
-t.add_equal(equal(multiply_units(segment('A', 'B'), segment('Q', 'F'), segment('D', 'E')), sum_units(multiply_units(segment('A', 'E'), segment('A','C'), segment('A','C')), multiply_units(segment('E', 'M'), segment('A','C'), segment('A','C')), multiply_units(segment('M', 'B'), segment('A','C'), segment('A', 'C')))), 'segment')
-＃数值测试
-t.add_equal(equal(sum_units(angle('A', 'B', 'C'), angle('A', 'D', 'C')), degree(180)), 'angle')
-t.add_equal(equal(sum_units(angle('A', 'B', 'C'), angle('A', 'M', 'C')), degree(180)), 'angle')
-＃全等三角形测试
+1.start接口：
+接口用途：解决一道题
+接口调用方式：
+＃该题的名称
+name = '中国联赛第一题'
+＃每个点的坐标列表
+point_list = [
+              ['A', -2.03, 6.83], 
+              ['B', 5.88, 6.71]
+              ['C', 10.27, 0.78]
+              ]
+＃条件列表
+condition_str_list = [
+                      'AB=AC', 
+                      '∠ABC+∠ADC=180°', 
+                      '∠ABC+∠AMC=180°'
+                      ]
+＃需证明的等式    
+need_prove_str = 'CM=CN'
+＃调用start接口
+＃其中deduce_num为循环推导次数(建议>=3)，auxiliary_num为最大辅助点个数，其余参数为简化推导所耗费时间的相关参数　
+t, ok = start(name, point_list, condition_str_list, need_prove_str, 
+              deduce_num=3, auxiliary_num=1, 
+              deduce_config={'angle_complex_max_len': 3, 
+                             'pre_check_triangle': False})
 
-＃相似三角形测试
-
+2.Graph对象：
+对象说明：一道几何题的“图”对象
+对象属性：
+＃初始化该图： 
+t = Graph('中国联赛第一题')
+＃在该图中添加一个点
+t.add_point('A', -2.03, 6.83)
+＃在该图中添加一个等式条件“线段CM=CN”
+t.add_equal(math_str_to_equal('CM=CN'), 'angle')
+t.add_equal(equal(segment('C', 'M'), segment('C', 'N')), 'angle')
+＃在该图中进行推导，得到更多等式条件，deduce_no表示为第几次循环推导，deduce_config为简化推导所耗费时间的相关参数（可省略）
+t.deduce(deduce_no=0, deduce_config)
+t.deduce(deduce_no=0)
+＃显示该图目前已推导出的所有信息
+t.display()
 

@@ -22,11 +22,11 @@ for this_condition_str in condition_str_list:
     else:
         t.add_equal(math_str_to_equal(this_condition_str), 'segment')
 
-deduce_config={'angle_complex_max_len': 3, 
+deduce_config={'angle_complex_max_len': 2, 
                'pre_check_triangle': False}
 
-t.deduce(deduce_no=0)
-t.deduce(deduce_no=1)
+t.deduce(0, deduce_config)
+t.deduce(1, deduce_config)
 
 t.display()
 

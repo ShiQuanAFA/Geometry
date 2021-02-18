@@ -83,19 +83,20 @@ def start(name, point_list, condition_str_list, need_prove_str,
         return 0
     return this_problem, has_proved
 
-name = '中国联赛第一题'
-point_list = [
-              ['A', -2.03, 6.83], 
-              ['B', 5.88, 6.71], 
-              ['C', 10.27, 0.78]
-              ]
-condition_str_list = [
-                      'AB=AC', 
-                      '∠ABC+∠ADC=180°', 
-                      '∠ABC+∠AMC=180°'
-                      ]
-need_prove_str = 'CM=CN'
-t, ok = start(name, point_list, condition_str_list, need_prove_str, 
-              deduce_num=3, auxiliary_num=1, 
-              deduce_config={'angle_complex_max_len': 3, 
-                             'pre_check_triangle': False})
+if __name__ == 'main':
+    name = '中国联赛第一题'
+    point_list = [
+                  ['A', -2.03, 6.83], 
+                  ['B', 5.88, 6.71], 
+                  ['C', 10.27, 0.78]
+                  ]
+    condition_str_list = [
+                          'AB=AC', 
+                          '∠ABC+∠ADC=180°', 
+                          '∠ABC+∠AMC=180°'
+                          ]
+    need_prove_str = 'CM=CN'
+    t, ok = start(name, point_list, condition_str_list, need_prove_str, 
+                  deduce_num=3, auxiliary_num=1, 
+                  deduce_config={'angle_complex_max_len': 3, 
+                                 'pre_check_triangle': False})
