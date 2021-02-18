@@ -1,11 +1,17 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+""" Import """
+from geometry_define import segment, angle, degree
 from geometry_define import sum_units, multiply_units, complex_units, equal
 from geometry_define import get_unit_type, get_unit_len, is_complex_type
 from geometry_define import get_complexunit_set
 from geometry_define import get_complexunit_except_unit, get_complexunit_inner_complexunit
 from geometry_define import get_unit_flatten_set
 from geometry_define import get_equal_except_unit
+from geometry_formula import is_collinear, is_isosceles, is_congruent, is_similar
+from geometry_formula import cal_an_angle_degree
+from geometry_formula import tuple_del, tuple_except_tuple
+from itertools import combinations
 
 """
 Define Entire Graph
@@ -16,7 +22,6 @@ class Graph:
         self.name = name
         self.points = {}
         """ Graph Known Conditions """
-        self.angle_values = {}
         self.segment_equals = []
         self.angle_equals = []
         
@@ -24,9 +29,6 @@ class Graph:
     def add_point(self, point_name, point_location_x, point_location_y):
         self.points[point_name] = {'location_x': point_location_x, 
                                    'location_y': point_location_y}
-    
-    def add_angle_value(self, this_angle_unit, this_value):
-        self.angle_values[this_angle_unit] = this_value
     
     def add_equal(self, this_equal, equal_type):
         
@@ -63,8 +65,51 @@ class Graph:
             raise Exception('add equal type error!')
 
     """ Deduction """
-    def deduce(self):
+    def deduce(self, deduce_no, deduce_config={'angle_complex_max_len': 3, 
+                                               'pre_check_triangle':False}):
         
+        """ space and collinear transform """
+        def space_and_collinear_transform(graph):
+            """ find collinear """
+            three_points_list = list(combinations(graph.points.keys(), 3))
+            triangles_list = three_points_list.copy()
+            collinear_list = []
+            for this_three_point in three_points_list:
+                yes_collinear, vertex_point, aside_points = is_collinear(graph, this_three_point)
+                if yes_collinear:
+                    triangles_list.remove(this_three_point)
+                    collinear_list.append((aside_points[0], vertex_point, aside_points[1]))
+            graph.triangles_list = triangles_list
+            graph.collinear_list = collinear_list
+            """ collinear transform """
+            for this_collinear in collinear_list:
+                graph.add_equal(equal(sum_units(segment(this_collinear[0], this_collinear[1]), 
+                                                segment(this_collinear[2], this_collinear[1])), 
+                                      segment(this_collinear[0], this_collinear[2])), 'segment')
+                out_points = tuple_except_tuple(graph.points.keys(), this_collinear)
+                for point_out in out_points:
+                    if not is_collinear(graph, (point_out, this_collinear[0], this_collinear[1]))[0]:
+                        graph.add_equal(equal(sum_units(angle(point_out, this_collinear[1], this_collinear[0]), 
+                                                        angle(point_out, this_collinear[1], this_collinear[2])), 
+                                              degree(180)), 'angle')
+                        graph.add_equal(equal(angle(point_out, this_collinear[0], this_collinear[1]), 
+                                              angle(point_out, this_collinear[0], this_collinear[2])), 'angle')
+                        graph.add_equal(equal(angle(point_out, this_collinear[2], this_collinear[1]), 
+                                              angle(point_out, this_collinear[2], this_collinear[0])), 'angle')
+            """ not collinear transform """
+            for this_triangle in triangles_list:
+                out_points = tuple_except_tuple(graph.points.keys(), this_triangle)
+                for point_vertex in this_triangle:
+                    point_aside = tuple_del(this_triangle, point_vertex)
+                    for point_out in out_points:
+                        degree_1 = cal_an_angle_degree(graph, point_out, point_vertex, point_aside[0])
+                        degree_2 = cal_an_angle_degree(graph, point_out, point_vertex, point_aside[1])
+                        degree_sum = cal_an_angle_degree(graph, point_aside[0], point_vertex, point_aside[1])
+                        if degree_1 > 5.0 and degree_2 > 5.0 and abs(degree_sum - degree_1 - degree_2) < 2.0:
+                            graph.add_equal(equal(sum_units(angle(point_out, point_vertex, point_aside[0]), 
+                                                            angle(point_out, point_vertex, point_aside[1])), 
+                                                  angle(point_aside[0], point_vertex, point_aside[1])), 'angle')
+
         """ complex units equal transform """
         def complex_units_equal_transform(graph, equals_list, equal_type):
             for each_equal in equals_list:
@@ -79,11 +124,12 @@ class Graph:
                             for each_another_equal in equals_list:
                                 if each_sub_unit in each_another_equal:
                                     for each_another_sub_unit in get_equal_except_unit(each_another_equal, each_sub_unit):
-                                        graph.add_equal(equal(
-                                            complex_units(complex_type, 
-                                                          get_complexunit_except_unit(each_complex_unit, each_sub_unit), 
-                                                          each_another_sub_unit), 
-                                            each_complex_unit), equal_type)                      
+                                        new_complex_unit = complex_units(complex_type, 
+                                                                         get_complexunit_except_unit(each_complex_unit, each_sub_unit), 
+                                                                         each_another_sub_unit)
+                                        if equal_type == 'angle' and get_unit_len(new_complex_unit) > deduce_config['angle_complex_max_len']:
+                                            continue
+                                        graph.add_equal(equal(new_complex_unit, each_complex_unit), equal_type)                      
                         """ eliminate sub unit """
                         """ AB+BM=AB+BC ---> BM=BC ; AB+BM+MN=AB+BC ---> BM+MN=BC """
                         """ AB*BM=AB*BC ---> BM=BC ; AB*BM*MN=AB*BC*DE ---> BM*MN=BC*DE """
@@ -137,24 +183,117 @@ class Graph:
                                                                                                get_complexunit_except_unit(excepted_unit, inner_sub_unit))
                                                                                      )
                                             graph.add_equal(equal(associated_complex_unit, each_complex_unit), equal_type)
-                                                        
+        
+        """ theorem transform """
+        def triangle_theorem_transform(graph):
+            triangles_list = graph.triangles_list
+            triangles_num = len(triangles_list)
+            for no_1 in range(triangles_num):
+                this_triangle = triangles_list[no_1]
+                """ interior angle summation 180° """
+                graph.add_equal(equal(sum_units(angle(this_triangle[1], this_triangle[0], this_triangle[2]), 
+                                                angle(this_triangle[0], this_triangle[1], this_triangle[2]), 
+                                                angle(this_triangle[0], this_triangle[2], this_triangle[1])), 
+                                      degree(180)), 'angle')
+                """ isosceles """
+                yes_isosceles, vertex_point, aside_points = is_isosceles(graph, this_triangle)
+                if yes_isosceles:
+                    graph.add_equal(equal(segment(vertex_point, aside_points[0]), 
+                                          segment(vertex_point, aside_points[1])), 'segment')
+                    graph.add_equal(equal(angle(vertex_point, aside_points[0], aside_points[1]), 
+                                          angle(vertex_point, aside_points[1], aside_points[0])), 'angle')
+                """ congruent and similar """
+                for no_2 in range(no_1+1, triangles_num):
+                    another_triangle = triangles_list[no_2]        
+                    """ congruent """
+                    yes_congruent, three_points_1, three_points_2 = is_congruent(graph, this_triangle, another_triangle)                            
+                    if yes_congruent:
+                        graph.add_equal(equal(segment(three_points_1[0], three_points_1[1]), 
+                                              segment(three_points_2[0], three_points_2[1])), 'segment')
+                        graph.add_equal(equal(segment(three_points_1[0], three_points_1[2]), 
+                                              segment(three_points_2[0], three_points_2[2])), 'segment')
+                        graph.add_equal(equal(segment(three_points_1[1], three_points_1[2]), 
+                                              segment(three_points_2[1], three_points_2[2])), 'segment')
+                        graph.add_equal(equal(angle(three_points_1[1], three_points_1[0], three_points_1[2]), 
+                                              angle(three_points_2[1], three_points_2[0], three_points_2[2])), 'angle')
+                        graph.add_equal(equal(angle(three_points_1[0], three_points_1[1], three_points_1[2]), 
+                                              angle(three_points_2[0], three_points_2[1], three_points_2[2])), 'angle')
+                        graph.add_equal(equal(angle(three_points_1[0], three_points_1[2], three_points_1[1]), 
+                                              angle(three_points_2[0], three_points_2[2], three_points_2[1])), 'angle')
+                    """ similar """
+                    yes_similar, three_points_1, three_points_2 = is_similar(graph, this_triangle, another_triangle)
+                    if yes_similar:
+                        graph.add_equal(equal(multiply_units(segment(three_points_1[0], three_points_1[1]), 
+                                                             segment(three_points_2[1], three_points_2[2])), 
+                                              multiply_units(segment(three_points_1[1], three_points_1[2]), 
+                                                             segment(three_points_2[0], three_points_2[1]))), 'segment')
+                        graph.add_equal(equal(multiply_units(segment(three_points_1[0], three_points_1[1]), 
+                                                             segment(three_points_2[0], three_points_2[2])), 
+                                              multiply_units(segment(three_points_1[0], three_points_1[2]), 
+                                                             segment(three_points_2[0], three_points_2[1]))), 'segment')
+                        graph.add_equal(equal(multiply_units(segment(three_points_1[0], three_points_1[2]), 
+                                                             segment(three_points_2[1], three_points_2[2])), 
+                                              multiply_units(segment(three_points_1[1], three_points_1[2]), 
+                                                             segment(three_points_2[0], three_points_2[2]))), 'segment')
+                        graph.add_equal(equal(angle(three_points_1[1], three_points_1[0], three_points_1[2]), 
+                                              angle(three_points_2[1], three_points_2[0], three_points_2[2])), 'angle')
+                        graph.add_equal(equal(angle(three_points_1[0], three_points_1[1], three_points_1[2]), 
+                                              angle(three_points_2[0], three_points_2[1], three_points_2[2])), 'angle')
+                        graph.add_equal(equal(angle(three_points_1[0], three_points_1[2], three_points_1[1]), 
+                                              angle(three_points_2[0], three_points_2[2], three_points_2[1])), 'angle')
+        
+        def quadrilateral_theorem_transform(graph):
+            triangles_list = graph.triangles_list
+            for this_triangle in triangles_list:
+                out_points = tuple_except_tuple(graph.points.keys(), this_triangle)
+                for point_vertex in this_triangle:
+                    point_aside = tuple_del(this_triangle, point_vertex)
+                    for point_out in out_points:
+                        """ coexist with a circle """
+                        if graph.query(equal(sum_units(angle(point_out, point_vertex, point_aside[0]), 
+                                                       angle(point_out, point_vertex, point_aside[1])), 
+                                             angle(point_aside[0], point_vertex, point_aside[1])), 'angle'):
+                            if graph.query(equal(sum_units(angle(point_aside[0], point_vertex, point_aside[1]), 
+                                                           angle(point_aside[0], point_out, point_aside[1])), 
+                                                 degree(180)), 'angle') or \
+                               graph.query(equal(angle(point_out, point_vertex, point_aside[1]), 
+                                                 angle(point_out, point_aside[0], point_aside[1])), 'angle') or \
+                               graph.query(equal(angle(point_out, point_vertex, point_aside[0]), 
+                                                 angle(point_out, point_aside[1], point_aside[0])), 'angle'):
+                                graph.add_equal(equal(angle(point_out, point_vertex, point_aside[1]), 
+                                                      angle(point_out, point_aside[0], point_aside[1])), 'angle')
+                                graph.add_equal(equal(angle(point_out, point_vertex, point_aside[0]), 
+                                                      angle(point_out, point_aside[1], point_aside[0])), 'angle')
+                                graph.add_equal(equal(angle(point_vertex, point_out, point_aside[1]), 
+                                                      angle(point_vertex, point_aside[0], point_aside[1])), 'angle')
+                                graph.add_equal(equal(angle(point_vertex, point_out, point_aside[0]), 
+                                                      angle(point_vertex, point_aside[1], point_aside[0])), 'angle')
+        
+        """ deduce transform """                    
+        if deduce_no == 0:
+            space_and_collinear_transform(self)
         complex_units_equal_transform(self, self.segment_equals, 'segment')
         complex_units_equal_transform(self, self.angle_equals, 'angle')
+        triangle_theorem_transform(self)
+        quadrilateral_theorem_transform(self)
     
-        """ space and collinear transform """
-        def space_and_collinear_transform(self):
-            
-            return 0
+    """ Auxiliary Point """
     
-        """ theorem transform """
-        def triangle_theorem_transform(self):
-            
-            return 0
     
     """ Query """
-    def query(self, query_equal):
-        return 0
-    
+    def query(self, query_equal, equal_type):
+        query_yes = False
+        if equal_type == 'segment':
+            for each_equal in self.segment_equals:
+                if query_equal.issubset(each_equal):
+                    query_yes = True
+                    break
+        elif equal_type == 'angle':
+            for each_equal in self.angle_equals:
+                if query_equal.issubset(each_equal):
+                    query_yes = True
+                    break
+        return query_yes
     
     """ Display """
     def display(self):
@@ -181,7 +320,7 @@ class Graph:
         
         def get_simplified_unit_math_str(this_unit):
             this_unit_math_str = unit_to_math_str(this_unit)
-            if this_unit_math_str[0] == '(' and this_unit_math_str[-1] == ')':
+            if get_unit_type(this_unit) == 'sum':
                 return this_unit_math_str[1:-1]
             else:
                 return this_unit_math_str
@@ -194,6 +333,9 @@ class Graph:
                 
         print('Graph Name:  ', self.name)
         print('points num:  ', len(self.points))
+        for each_point in self.points:
+            location = self.points[each_point]
+            print('  ', each_point, '  (', location['location_x'], ',', location['location_y'], ')')
         print('segment equals:  ', len(self.segment_equals))
         for each_segment_equal in self.segment_equals:
             print('  ', equal_to_math_str(each_segment_equal))

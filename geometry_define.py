@@ -67,7 +67,7 @@ def equal(*args):
         return this_equal
 
 """
-Get unit values
+Get unit and relationship values
 """
 def is_complex_type(this_unit):
     return get_unit_type(this_unit) in ['sum', 'multiply']
