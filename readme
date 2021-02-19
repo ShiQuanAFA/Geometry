@@ -3,6 +3,8 @@ multiset==2.1.1
 
 软件说明：欧式几何证明题自动推导
 
+接口文档：
+
 1.start接口：
 接口用途：解决一道题
 接口调用方式：
@@ -11,7 +13,7 @@ name = '中国联赛第一题'
 ＃每个点的坐标列表
 point_list = [
               ['A', -2.03, 6.83], 
-              ['B', 5.88, 6.71]
+              ['B', 5.88, 6.71],
               ['C', 10.27, 0.78]
               ]
 ＃条件列表
@@ -45,3 +47,44 @@ t.deduce(deduce_no=0)
 ＃显示该图目前已推导出的所有信息
 t.display()
 
+
+软件使用介绍示例（以《单遵平面几何》第65题为例）：
+
+（一）拿到题目，在几何画板上准确画出图形中每个点坐标
+
+（二）输入该题目的信息
+＃输入题目名称
+name = '单遵几何第65题'
+＃输入每个点的坐标列表
+point_list = [
+              ['A', -2.03, 6.83], 
+              ['B', 5.88, 6.71],
+              ['C', 10.27, 0.78], 
+	      ['D', 2.17, -1.08], 
+	      ['E', 2.01, 4.84], 
+	      ['F', 1.90, 6.77], 
+	      ['G', 8.08, 3.74] 
+              ]
+＃输入题目已知条件
+condition_str_list = [
+                      '∠BDE=∠BCE', 
+                      '∠BFG=∠BAC', 
+                      'FE*FD=BF*BF'
+                      ]
+＃输入最终需证明的等式    
+need_prove_str = '∠BDC=∠FDG'
+
+（三）将以上输入信息调用接口（其中deduce_num为循环推导次数(建议>=3)，auxiliary_num为最大辅助点个数，其余参数为简化推导所耗费时间的相关参数，可保持默认值）
+
+t, ok = start(name, point_list, condition_str_list, need_prove_str, 
+              deduce_num=5, auxiliary_num=1, 
+              deduce_config={'angle_complex_max_len': 2, 
+                             'pre_check_triangle': False})
+
+（四）接口返回对象为该题目的图对象实例(Class Graph类型)和是否解答成功(Boolean类型)
+调用t.display()查看自动推理完毕后得到的所有几何等量关系
+
+（五）通过t.query方法来查询要证明的等式是否已经在被推理出的等量关系里面
+t.query(math_str_to_equal('∠BDC=∠FDG'), 'angle')
+
+（六）如返回True，则说明该证明题已经被解决，如返回False，则说明没有被解决，可在原图形中添加新的辅助点后重新输入信息并调用接口进行自动推理
