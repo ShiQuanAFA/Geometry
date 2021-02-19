@@ -13,8 +13,9 @@ t.add_point('F', 1.9, 6.77)
 t.add_point('G', 8.08, 3.74)
 
 condition_str_list = [
-                      '∠ABC+∠ADC=180°', 
-                      '∠ABC+∠AMC=180°'
+                      '∠BDE=∠BCE', 
+                      '∠BFG=∠BAC', 
+                      'FE*FD=BF*BF'
                       ]
 for this_condition_str in condition_str_list:
     if '∠' in this_condition_str:
@@ -22,14 +23,14 @@ for this_condition_str in condition_str_list:
     else:
         t.add_equal(math_str_to_equal(this_condition_str), 'segment')
 
-deduce_config={'angle_complex_max_len': 2, 
-               'pre_check_triangle': False}
+deduce_config={'angle_complex_max_len': 2, 'pre_check_triangle': False}
 
 t.deduce(0, deduce_config)
 t.deduce(1, deduce_config)
 
 t.display()
 
+t.query(math_str_to_equal('∠BDC=∠FDG'), 'angle')
 
 ## deep equal
 #{

@@ -78,25 +78,29 @@ def start(name, point_list, condition_str_list, need_prove_str,
             print('Has proved!!!')
             break
     """ auxiliary deduce """
-    if not has_proved:
-        
-        return 0
+#    if not has_proved:
+#        
+#        return 0
     return this_problem, has_proved
 
 if __name__ == 'main':
-    name = '中国联赛第一题'
+    name = '单遵几何第65题'
     point_list = [
                   ['A', -2.03, 6.83], 
-                  ['B', 5.88, 6.71], 
-                  ['C', 10.27, 0.78]
+                  ['B', 5.88, 6.71],
+                  ['C', 10.27, 0.78], 
+                  ['D', 2.17, -1.08], 
+                  ['E', 2.01, 4.84], 
+                  ['F', 1.90, 6.77], 
+                  ['G', 8.08, 3.74] 
                   ]
     condition_str_list = [
-                          'AB=AC', 
-                          '∠ABC+∠ADC=180°', 
-                          '∠ABC+∠AMC=180°'
+                          '∠BDE=∠BCE', 
+                          '∠BFG=∠BAC', 
+                          'FE*FD=BF*BF'
                           ]
-    need_prove_str = 'CM=CN'
+    need_prove_str = '∠BDC=∠FDG'
     t, ok = start(name, point_list, condition_str_list, need_prove_str, 
-                  deduce_num=3, auxiliary_num=1, 
-                  deduce_config={'angle_complex_max_len': 3, 
+                  deduce_num=5, auxiliary_num=1, 
+                  deduce_config={'angle_complex_max_len': 2, 
                                  'pre_check_triangle': False})
