@@ -39,8 +39,8 @@ t = Graph('中国联赛第一题')
 ＃在该图中添加一个点
 t.add_point('A', -2.03, 6.83)
 ＃在该图中添加一个等式条件“线段CM=CN”
-t.add_equal(math_str_to_equal('CM=CN'), 'angle')
-t.add_equal(equal(segment('C', 'M'), segment('C', 'N')), 'angle')
+t.add_equal(math_str_to_equal('CM=CN'), 'segment')
+t.add_equal(equal(segment('C', 'M'), segment('C', 'N')), 'segment')
 ＃在该图中进行推导，得到更多等式条件，deduce_no表示为第几次循环推导，deduce_config为简化推导所耗费时间的相关参数（可省略）
 t.deduce(deduce_no=0, deduce_config)
 t.deduce(deduce_no=0)
